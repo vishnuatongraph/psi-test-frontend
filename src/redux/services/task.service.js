@@ -17,6 +17,10 @@ class UserService {
         return http.get(`/task?id=${id}`);
     }
 
+    search(id, query) {
+        return http.get(`/task?id=${id}&query=${query}`);
+    }
+
     
 }
 

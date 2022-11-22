@@ -35,28 +35,9 @@ function userReducer(state = initialState, action) {
       };
 
     case SEARCH_TASKS:
-      let allTasks=[]
-      let searchTasks = []
-      let tasks = [...state.tasks];
-      let newT = tasks.filter((x) => {
-        return x.name.match(payload)
-      });
-      console.log(newT, "newT")
-      if (!payload || payload === '') {
-        allTasks = tasks
-        searchTasks = []
-      }
-      else if (!newT.length) {
-        allTasks = tasks
-        searchTasks = []
-      } else if (Array.isArray(newT)) {
-        searchTasks = newT
-        allTasks = tasks
-      }
       return {
         ...state,
-        searchedTask: searchTasks,
-        tasks: allTasks
+        tasks: payload
       };
 
     case DELETE_TASK:

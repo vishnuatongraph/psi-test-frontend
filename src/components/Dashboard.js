@@ -8,20 +8,25 @@ import {
   createTask,
   deleteTask,
   getTasks,
+  searchTasks,
   updateTask,
 } from "../redux/actions/tasks";
-import { SEARCH_TASKS } from "../redux/actions/types";
+import ThreeCards from "./ThreeCards";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
-  const { tasks, searchedTask } = useSelector((state) => state.tasks);
+  const { tasks } = useSelector((state) => state.tasks);
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const [show, setShow] = useState(false);
   const [name, setName] = useState("");
   const [edit, setEdit] = useState(null);
-  const [allTasks, setAllTasks] = useState([]);
+  const [searchedTask, setSearchedTask] = useState([]);
+  const [query, setQuery] = useState("");
 
-  const handleClose = () => setShow(false);
+  const handleClose = () => {
+    setName('');
+    setShow(false)
+  };
   const handleShow = () => setShow(true);
 
   useEffect(() => {
@@ -31,10 +36,6 @@ const Dashboard = () => {
         console.log(err);
       });
   }, []);
-
-  useEffect(() => {
-    setAllTasks(searchedTask.length > 0 ? searchedTask : tasks);
-  }, [searchedTask, tasks]);
 
   const submit = () => {
     if (name === "") {
@@ -87,7 +88,15 @@ const Dashboard = () => {
   };
 
   const searchTask = (text) => {
-    dispatch({ type: SEARCH_TASKS, payload: text });
+    setQuery(text);
+    dispatch(searchTasks(currentUser.id, text))
+      .then((res) => {
+        console.log(res);
+        setSearchedTask(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   // Event to get selected rows(Optional)
@@ -96,86 +105,30 @@ const Dashboard = () => {
     <div className="container">
       {tasks.length > 0 ? (
         <>
-          <div className="row mx-auto">
-            <div className="col-md-4">
-              <Card className="mt-3 shadow">
-                <Card.Body>
-                  <Card.Title>Task Completed</Card.Title>
-                  <Card.Title className="shadow_btn">
-                    {tasks.filter((x) => x.completed == true).length}
-                  </Card.Title>
-                  <Card.Text>/{tasks.length}</Card.Text>
-                </Card.Body>
-              </Card>
+          <ThreeCards tasks={tasks} />
+          <div className="row mt-5">
+            <div className="col-md-8" style={{textAlign:'left'}}>
+              <h4>Tasks</h4>
             </div>
-            <div className="col-md-4">
-              <Card
-                className="mt-3 shadow"
-                style={{ height: 125, overflow: "scroll" }}
-              >
-                <Card.Body>
-                  <Card.Title>Latest Created Tasks</Card.Title>
-                  {tasks.map((task, i) => (
-                    <Card.Text
-                      key={i}
-                      style={{
-                        textDecorationLine: task.completed
-                          ? "line-through"
-                          : "",
-                      }}
-                    >
-                      {task.name}
-                    </Card.Text>
-                  ))}
-                </Card.Body>
-              </Card>
+            <div className="col-md-2">
+              <input
+                placeholder="search by task name"
+                className="form-control"
+                onChange={(e) => searchTask(e.target.value)}
+                //   style={{ width: "30%" }}
+              />
             </div>
-            <div className="col-md-4">
-              <Card className="mt-3 shadow">
-                <Card.Body>
-                  <PieChart
-                    style={{ height: 95 }}
-                    data={[
-                      {
-                        title: "Completed",
-                        value: tasks.filter((x) => x.completed == true).length,
-                        color: "#5285ec",
-                      },
-                      {
-                        title: "In-Complete",
-                        value: tasks.filter((x) => x.completed == false).length,
-                        color: "#e8ecec",
-                      },
-                    ]}
-                  />
-                </Card.Body>
-              </Card>
+            <div className="col-md-2">
+              <Button variant="primary" onClick={handleShow}>
+                New Task
+              </Button>
             </div>
           </div>
           <div className="mt-5">
             <div className="col-md-12">
               <table className="table">
-                <thead>
-                  <th></th>
-                  <th style={{ textAlign: "left" }}>
-                    <span>Tasks</span>
-                  </th>
-                  <td>
-                    <input
-                      placeholder="search by task name"
-                      className="form-control"
-                      onChange={(e) => searchTask(e.target.value)}
-                      //   style={{ width: "30%" }}
-                    />
-                  </td>
-                  {/* <td> */}
-                  <Button variant="primary" onClick={handleShow}>
-                    New Task
-                  </Button>
-                  {/* </td> */}
-                </thead>
                 <tbody>
-                  {allTasks?.map((task, i) => (
+                  {tasks?.map((task, i) => (
                     <tr key={i} className={task.completed ? "selected" : ""}>
                       <th scope="row">
                         <input

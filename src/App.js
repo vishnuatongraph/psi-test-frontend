@@ -1,12 +1,13 @@
 import "./App.css";
 import Dummy from "./assets/dummy.jpeg";
-import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
+import { Routes, Route, BrowserRouter, Navigate, useNavigate } from "react-router-dom";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "./redux/actions/users";
 import { useEffect } from "react";
 import { GET_USER } from "./redux/actions/types";
+import PrivateRoute from "./PrivateRoute";
 
 function App() {
   const currentUser = JSON.parse(localStorage.getItem("user"));
@@ -33,7 +34,7 @@ function App() {
             {" "}
             <div className="user" style={{ marginLeft: "50px" }}>
               <img src={Dummy} alt="user" className="image" />
-              <p style={{ marginLeft: "10px" }}>{user.name}</p>
+              <p style={{ marginLeft: "10px", paddingTop:15 }}>{user.name}</p>
             </div>
             <span style={{ marginRight: "50px", cursor:'pointer' }} onClick={logout}>
               Logout
@@ -43,17 +44,13 @@ function App() {
       </div>
       <BrowserRouter>
         <Routes>
-          {user?.id ? (
-            <>
-              <Route path="/*" element={<Dashboard />} />
-              <Route index element={<Navigate to="/dashboard" />} />
-            </>
-          ) : (
-            <>
+              <Route path="dashboard" element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute> } />
+
               <Route path="login/*" element={<Login />} />
-              <Route path='*' element={<Navigate to="/login" />} />
-            </>
-          )}
+              <Route path='/' element={<Navigate to="/login" />} />
         </Routes>
       </BrowserRouter>
     </div>

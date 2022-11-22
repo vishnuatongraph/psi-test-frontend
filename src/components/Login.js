@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import { useDispatch } from "react-redux";
@@ -7,9 +7,15 @@ import {useNavigate} from 'react-router-dom'
 
 const Login = () => {
   const dispatch = useDispatch();
+  const currentUser = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
   const [name, setName] = useState('');
 
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/dashboard')
+    }
+  }, []);
 
   const submit = () => {
     if (name === "") {
