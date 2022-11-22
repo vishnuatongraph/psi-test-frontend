@@ -12,6 +12,7 @@ function App() {
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const dispatch = useDispatch();
   const {user} = useSelector((state)=>state.users)
+  console.log(user, "user123")
 
   useEffect(() => {
     if (currentUser) {
@@ -50,7 +51,7 @@ function App() {
           ) : (
             <>
               <Route path="login/*" element={<Login />} />
-              <Route path="*" element={<Navigate to="/login" />} />
+              <Route path='*' element={<Navigate to="/login" />} />
             </>
           )}
         </Routes>
