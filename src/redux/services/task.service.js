@@ -1,6 +1,6 @@
 import http from '../../axios-client';
 
-class UserService {
+class TaskService {
     create(data) {
         return http.post("/task", JSON.stringify(data));
     }
@@ -20,8 +20,7 @@ class UserService {
     search(id, query) {
         return http.get(`/task?id=${id}&query=${query}`);
     }
-
     
 }
 
-export default new UserService();
+export default new TaskService();

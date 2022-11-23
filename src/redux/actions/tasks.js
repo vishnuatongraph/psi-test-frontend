@@ -1,4 +1,4 @@
-import { ADD_TASK, UPDATE_TASK, DELETE_TASK, GET_TASKS, SEARCH_TASKS } from "./types";
+import { ADD_TASK, UPDATE_TASK, DELETE_TASK, GET_TASKS } from "./types";
 
 import TaskService from "../services/task.service";
 
@@ -57,10 +57,6 @@ export const getTasks = (id) => async (dispatch) => {
 export const searchTasks = (id, query) => async (dispatch) => {
   try {
     const res = await TaskService.search(id, query);
-    dispatch({
-      type: SEARCH_TASKS,
-      payload: res.data,
-    });
     return Promise.resolve(res.data);
   } catch (err) {
     return Promise.reject(err);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +12,9 @@ import {
   updateTask,
 } from "../redux/actions/tasks";
 import ThreeCards from "./ThreeCards";
+import TaskModal from "./TaskModal";
+import { Col, Container, Row, Table } from "react-bootstrap";
+import TaskTable from "./TaskTable";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -24,8 +27,8 @@ const Dashboard = () => {
   const [query, setQuery] = useState("");
 
   const handleClose = () => {
-    setName('');
-    setShow(false)
+    setName("");
+    setShow(false);
   };
   const handleShow = () => setShow(true);
 
@@ -43,7 +46,6 @@ const Dashboard = () => {
     }
     dispatch(createTask({ name, user_id: currentUser.id }))
       .then((res) => {
-        console.log(res);
         handleClose();
       })
       .catch((err) => {
@@ -57,7 +59,14 @@ const Dashboard = () => {
     }
     dispatch(updateTask({ name }, edit))
       .then((res) => {
-        console.log(res);
+        if(query !== '') {
+          let newTasks = [...searchedTask];
+          const i = newTasks.findIndex((x) => x.id === edit);
+          if (i !== -1) {
+            newTasks[i] = res;
+            setSearchedTask(newTasks)
+          }
+        }
         setEdit(null);
         handleClose();
       })
@@ -69,7 +78,14 @@ const Dashboard = () => {
   const deleteT = (id) => {
     dispatch(deleteTask(id))
       .then((res) => {
-        console.log(res);
+        if(query !== '') {
+          let newTasks = [...searchedTask];
+          const i = newTasks.findIndex((x) => x.id === id);
+          if (i !== -1) {
+            newTasks.splice(i, 1);
+            setSearchedTask(newTasks)
+          }
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -80,94 +96,69 @@ const Dashboard = () => {
   const onItemCheck = (e, id) => {
     dispatch(updateTask({ completed: e.target.checked }, id))
       .then((res) => {
-        console.log(res);
+        if(query !== '') {
+          let newTasks = [...searchedTask];
+          const i = newTasks.findIndex((x) => x.id === id);
+          if (i !== -1) {
+            newTasks[i] = res;
+            setSearchedTask(newTasks)
+          }
+        }
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-  const searchTask = (text) => {
+  const searchTask = useCallback((text) => {
     setQuery(text);
     dispatch(searchTasks(currentUser.id, text))
       .then((res) => {
-        console.log(res);
         setSearchedTask(res);
       })
       .catch((err) => {
         console.log(err);
       });
+  },[]);
+
+  const onEdit = (task) => {
+    setEdit(task.id);
+    setName(task.name);
+    handleShow();
   };
 
   // Event to get selected rows(Optional)
 
   return (
-    <div className="container">
+    <Container>
       {tasks.length > 0 ? (
         <>
           <ThreeCards tasks={tasks} />
-          <div className="row mt-5">
-            <div className="col-md-8" style={{textAlign:'left'}}>
+          <Row className="mt-5">
+            <Col md={8} sm={8} className='text-left'>
               <h4>Tasks</h4>
-            </div>
-            <div className="col-md-2">
+            </Col>
+            <Col md={2} sm={2}>
               <input
                 placeholder="search by task name"
                 className="form-control"
                 onChange={(e) => searchTask(e.target.value)}
-                //   style={{ width: "30%" }}
               />
-            </div>
-            <div className="col-md-2">
+            </Col>
+            <Col md={2} sm={2}>
               <Button variant="primary" onClick={handleShow}>
                 New Task
               </Button>
-            </div>
-          </div>
-          <div className="mt-5">
+            </Col>
+          </Row>
+          <div className="mt-2">
             <div className="col-md-12">
-              <table className="table">
-                <tbody>
-                  {tasks?.map((task, i) => (
-                    <tr key={i} className={task.completed ? "selected" : ""}>
-                      <th scope="row">
-                        <input
-                          type="checkbox"
-                          checked={task.completed}
-                          className="form-check-input"
-                          id="rowcheck{task.id}"
-                          onChange={(e) => onItemCheck(e, task.id)}
-                        />
-                      </th>
-                      <td style={{ width: "70%", textAlign: "left" }}>
-                        {task.name}
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-success"
-                          onClick={() => {
-                            setEdit(task.id);
-                            setName(task.name);
-                            handleShow();
-                          }}
-                        >
-                          Edit
-                        </button>
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-danger"
-                          onClick={() => deleteT(task.id)}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <TaskTable
+                tasks={query !== "" ? searchedTask : tasks}
+                onEdit={onEdit}
+                deleteT={deleteT}
+                onItemCheck={onItemCheck}
+              />
             </div>
           </div>
         </>
@@ -182,26 +173,16 @@ const Dashboard = () => {
         </Card>
       )}
 
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>+ New Task</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <input
-            placeholder="name"
-            className="form-control mt-2"
-            value={name}
-            name="name"
-            onChange={(e) => setName(e.target.value)}
-          />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={!edit ? submit : update}>
-            {edit ? "Update" : "New"} Task
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
+      <TaskModal
+        show={show}
+        edit={edit}
+        submit={submit}
+        update={update}
+        setName={setName}
+        name={name}
+        handleClose={handleClose}
+      />
+    </Container>
   );
 };
 

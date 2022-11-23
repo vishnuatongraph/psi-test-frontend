@@ -13,7 +13,6 @@ function App() {
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const dispatch = useDispatch();
   const {user} = useSelector((state)=>state.users)
-  console.log(user, "user123")
 
   useEffect(() => {
     if (currentUser) {
@@ -32,11 +31,11 @@ function App() {
         {user?.id && (
           <>
             {" "}
-            <div className="user" style={{ marginLeft: "50px" }}>
+            <div className="user">
               <img src={Dummy} alt="user" className="image" />
-              <p style={{ marginLeft: "10px", paddingTop:15 }}>{user.name}</p>
+              <p className="username">{user.name}</p>
             </div>
-            <span style={{ marginRight: "50px", cursor:'pointer' }} onClick={logout}>
+            <span className="logout" onClick={logout}>
               Logout
             </span>
           </>

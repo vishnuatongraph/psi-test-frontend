@@ -24,7 +24,7 @@
   margin-top: 50px;
   background-color: #f2f2f2;
   height: 70px;
-  width: '100%';
+  width: "100%";
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -36,13 +36,41 @@
 .user {
   display: flex;
   align-items: center;
+  padding-left: 50px;
 }
 
- .image {
+.username {
+  padding-left: 10px;
+  padding-top: 15px;
+}
+
+.logout {
+  margin-right: 50px;
+  cursor: pointer;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.column-width {
+  width: 70%;
+  text-align: left;
+}
+
+.tasks {
+  overflow: scroll;
+}
+
+.linethrough {
+  text-decoration: line-through;
+}
+
+.image {
   height: 40px;
   width: 40px;
   border-radius: 100px;
- }
+}
 
 .App-link {
   color: #61dafb;
@@ -56,4 +84,7 @@
     transform: rotate(360deg);
   }
 }
-/* .shadow_btn  */
+.shadow_btn {
+  color: #61dafb;
+  /* font-size: 10px; */
+}

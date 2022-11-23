@@ -10,6 +10,7 @@ const Login = () => {
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
   const [name, setName] = useState('');
+  const [id, setId] = useState()
 
   useEffect(() => {
     if (currentUser) {
@@ -18,18 +19,18 @@ const Login = () => {
   }, []);
 
   const submit = () => {
-    if (name === "") {
+    if (id === '' || !id || name === "") {
       return alert("Fields are required");
     }
-    dispatch(createUser({name}))
+    dispatch(createUser({name,id}))
       .then((user) => {
-        console.log(user, "user12");
         if(user.id) {
             navigate('/dashboard')
         }
       })
       .catch((err) => {
         console.log(err);
+        alert(err.response.data.errors[0].message)
       });
   };
 
@@ -41,13 +42,15 @@ const Login = () => {
           className="form-control"
           type={"number"}
           name="id"
+          value={id}
+          onChange={(e)=>setId(e.target.value)}
         />
         <input
           placeholder="name"
           className="form-control mt-2"
           value={name}
           name="name"
-          onChange={(e)=>setName(e.target.value.trim())}
+          onChange={(e)=>setName(e.target.value)}
         />
         <Button variant="primary" className="mt-2" onClick={submit}>
           Login
