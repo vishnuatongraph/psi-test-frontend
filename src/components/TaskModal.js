@@ -1,7 +1,8 @@
-import React from "react";
-import { Button, Modal } from "react-bootstrap";
+import React, {useState} from "react";
+import { Button, Modal, Spinner } from "react-bootstrap";
 
-const TaskModal = ({show, handleClose, edit, name, setName, update, submit}) => {
+const TaskModal = ({show, handleClose, edit, name, setName, update, submit, loader}) => {
+
     return (
         <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
@@ -17,8 +18,10 @@ const TaskModal = ({show, handleClose, edit, name, setName, update, submit}) => 
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={!edit ? submit : update}>
-            {edit ? "Update" : "New"} Task
+          <Button variant="primary" onClick={!edit ? submit : update} disabled={loader}>
+            {loader ? <Spinner animation="border" role="status" />
+          :   edit ? "Update Task" : "New Task"
+          }
           </Button>
         </Modal.Footer>
       </Modal>

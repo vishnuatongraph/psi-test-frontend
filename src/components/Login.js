@@ -4,6 +4,12 @@ import Card from "react-bootstrap/Card";
 import { useDispatch } from "react-redux";
 import { createUser } from "../redux/actions/users";
 import {useNavigate} from 'react-router-dom'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Spinner from 'react-bootstrap/Spinner';
+import {LOGIN, VALIDATION} from '../constant'
+
+
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -11,6 +17,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [id, setId] = useState()
+  const [loader, setLoader] = useState(false)
 
   useEffect(() => {
     if (currentUser) {
@@ -20,17 +27,22 @@ const Login = () => {
 
   const submit = () => {
     if (id === '' || !id || name === "") {
-      return alert("Fields are required");
+      return toast.error(VALIDATION);
     }
+    setLoader(true)
     dispatch(createUser({name,id}))
       .then((user) => {
         if(user.id) {
+          toast.success(LOGIN)
+          setTimeout(()=>{
             navigate('/dashboard')
+            setLoader(false)    
+          },1000)
         }
       })
       .catch((err) => {
-        console.log(err);
-        alert(err.response.data.errors[0].message)
+        setLoader(false)    
+        toast.error(err.response.data.errors[0].message)
       });
   };
 
@@ -52,10 +64,12 @@ const Login = () => {
           name="name"
           onChange={(e)=>setName(e.target.value)}
         />
-        <Button variant="primary" className="mt-2" onClick={submit}>
-          Login
+        <Button variant="primary" className="mt-2" onClick={submit} disabled={loader}>
+         {!loader ? 'Login'
+         : <Spinner animation="border" role="status" />}
         </Button>
       </Card.Body>
+      <ToastContainer theme="colored" position="bottom-right" />
     </Card>
   );
 };

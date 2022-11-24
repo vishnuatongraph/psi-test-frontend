@@ -15,6 +15,10 @@ import ThreeCards from "./ThreeCards";
 import TaskModal from "./TaskModal";
 import { Col, Container, Row, Table } from "react-bootstrap";
 import TaskTable from "./TaskTable";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import {CREATED, UPDATED,TASK_VALIDATION, DELETED} from '../constant'
+
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -25,40 +29,50 @@ const Dashboard = () => {
   const [edit, setEdit] = useState(null);
   const [searchedTask, setSearchedTask] = useState([]);
   const [query, setQuery] = useState("");
+  const [loader, setLoader] = useState(false)
+  const [checkLoader, setcheckLoader] = useState(false)
+
 
   const handleClose = () => {
     setName("");
     setShow(false);
   };
+  
   const handleShow = () => setShow(true);
 
   useEffect(() => {
     dispatch(getTasks(currentUser?.id))
       .then((res) => {})
       .catch((err) => {
-        console.log(err);
+        toast.error(err.response.data.errors[0].message);
       });
   }, []);
 
   const submit = () => {
     if (name === "") {
-      return alert("Enter a task");
+      return toast.warn(TASK_VALIDATION);
     }
+    setLoader(true)
     dispatch(createTask({ name, user_id: currentUser.id }))
       .then((res) => {
+        toast.success(CREATED);
         handleClose();
+        setLoader(false)
       })
       .catch((err) => {
-        console.log(err);
+        setLoader(false)
+        toast.error(err.response.data.errors[0].message);
       });
   };
 
   const update = () => {
     if (name === "") {
-      return alert("Enter a task");
+      return toast.warn(TASK_VALIDATION);
     }
+    setLoader(true)
     dispatch(updateTask({ name }, edit))
       .then((res) => {
+        toast.success(UPDATED);
         if(query !== '') {
           let newTasks = [...searchedTask];
           const i = newTasks.findIndex((x) => x.id === edit);
@@ -67,17 +81,20 @@ const Dashboard = () => {
             setSearchedTask(newTasks)
           }
         }
+        setLoader(false)
         setEdit(null);
         handleClose();
       })
       .catch((err) => {
-        console.log(err);
+        setLoader(false)
+        toast.error(err.response.data.errors[0].message);
       });
   };
 
   const deleteT = (id) => {
     dispatch(deleteTask(id))
       .then((res) => {
+        toast.success(DELETED);
         if(query !== '') {
           let newTasks = [...searchedTask];
           const i = newTasks.findIndex((x) => x.id === id);
@@ -88,14 +105,16 @@ const Dashboard = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(err.response.data.errors[0].message);
       });
   };
 
   // Update List Item's state and Master Checkbox State
   const onItemCheck = (e, id) => {
+    setcheckLoader(true)
     dispatch(updateTask({ completed: e.target.checked }, id))
       .then((res) => {
+        toast.success(UPDATED);
         if(query !== '') {
           let newTasks = [...searchedTask];
           const i = newTasks.findIndex((x) => x.id === id);
@@ -104,9 +123,11 @@ const Dashboard = () => {
             setSearchedTask(newTasks)
           }
         }
+        setcheckLoader(false)
       })
       .catch((err) => {
-        console.log(err);
+        setcheckLoader(false)
+        toast.error(err.response.data.errors[0].message);
       });
   };
 
@@ -117,7 +138,7 @@ const Dashboard = () => {
         setSearchedTask(res);
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(err.response.data.errors[0].message);
       });
   },[]);
 
@@ -158,6 +179,7 @@ const Dashboard = () => {
                 onEdit={onEdit}
                 deleteT={deleteT}
                 onItemCheck={onItemCheck}
+                loader={checkLoader}
               />
             </div>
           </div>
@@ -181,7 +203,10 @@ const Dashboard = () => {
         setName={setName}
         name={name}
         handleClose={handleClose}
+        loader={loader}
       />
+      <ToastContainer theme="colored" position="bottom-right" />
+
     </Container>
   );
 };

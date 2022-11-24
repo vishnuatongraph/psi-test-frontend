@@ -1,0 +1,7 @@
+export const API_URL = 'https://psi-test-backend.herokuapp.com'
+export const LOGIN = 'Hurray, Login Successfull!'
+export const VALIDATION = 'Fields are required'
+export const TASK_VALIDATION = 'Enter a task'
+export const CREATED = 'Task created!!'
+export const UPDATED = 'Task updated!!'
+export const DELETED = 'Task deleted!!'
