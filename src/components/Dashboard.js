@@ -2,8 +2,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { useDispatch, useSelector } from "react-redux";
-import Modal from "react-bootstrap/Modal";
-import { PieChart } from "react-minimal-pie-chart";
 import {
   createTask,
   deleteTask,
@@ -13,7 +11,7 @@ import {
 } from "../redux/actions/tasks";
 import ThreeCards from "./ThreeCards";
 import TaskModal from "./TaskModal";
-import { Col, Container, Row, Table } from "react-bootstrap";
+import { Col, Container, Row } from "react-bootstrap";
 import TaskTable from "./TaskTable";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -41,7 +39,7 @@ const Dashboard = () => {
   const handleShow = () => setShow(true);
 
   useEffect(() => {
-    dispatch(getTasks(currentUser?.id))
+    dispatch(getTasks(currentUser?.id, currentUser?.api_token))
       .then((res) => {})
       .catch((err) => {
         toast.error(err.response.data.errors[0].message);

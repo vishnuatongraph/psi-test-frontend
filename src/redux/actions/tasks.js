@@ -41,9 +41,9 @@ export const updateTask = (data, id) => async (dispatch) => {
   }
 };
 
-export const getTasks = (id) => async (dispatch) => {
+export const getTasks = (id, token) => async (dispatch) => {
   try {
-    const res = await TaskService.getAll(id);
+    const res = await TaskService.getAll(id, token);
     dispatch({
       type: GET_TASKS,
       payload: res.data,

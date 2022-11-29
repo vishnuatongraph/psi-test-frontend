@@ -15,8 +15,8 @@ const Login = () => {
   const dispatch = useDispatch();
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
-  const [name, setName] = useState('');
-  const [id, setId] = useState()
+  const [username, setUsername] = useState()
+  const [password, setPassword] = useState('');
   const [loader, setLoader] = useState(false)
 
   useEffect(() => {
@@ -26,17 +26,17 @@ const Login = () => {
   }, []);
 
   const submit = () => {
-    if (id === '' || !id || name === "") {
+    if (username === '' || !username || password === "") {
       return toast.error(VALIDATION);
     }
     setLoader(true)
-    dispatch(createUser({name,id}))
+    dispatch(createUser({username, password}))
       .then((user) => {
-        if(user.id) {
+        setLoader(false)    
+        if(user?.id) {
           toast.success(LOGIN)
           setTimeout(()=>{
             navigate('/dashboard')
-            setLoader(false)    
           },1000)
         }
       })
@@ -50,19 +50,18 @@ const Login = () => {
     <Card style={{ width: "20rem" }} className="mt-5 mx-auto">
       <Card.Body>
         <input
-          placeholder="id"
+          placeholder="username"
           className="form-control"
-          type={"number"}
-          name="id"
-          value={id}
-          onChange={(e)=>setId(e.target.value)}
+          name="username"
+          value={username}
+          onChange={(e)=>setUsername(e.target.value)}
         />
         <input
-          placeholder="name"
+          placeholder="password"
           className="form-control mt-2"
-          value={name}
-          name="name"
-          onChange={(e)=>setName(e.target.value)}
+          value={password}
+          name="password"
+          onChange={(e)=>setPassword(e.target.value)}
         />
         <Button variant="primary" className="mt-2" onClick={submit} disabled={loader}>
          {!loader ? 'Login'

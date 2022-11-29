@@ -2,6 +2,7 @@ import axios from "axios";
 import {API_URL} from './constant.js'
 
 const user = JSON.parse(localStorage.getItem('user'))
+
 export default axios.create({
   baseURL: API_URL,
   headers: {
